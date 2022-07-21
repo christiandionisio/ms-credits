@@ -20,12 +20,12 @@ public class CreditController {
     }
 
     @PostMapping
-    public Mono<Credit> create(Credit credit) {
+    public Mono<Credit> create(@RequestBody Credit credit) {
         return service.create(credit);
     }
 
     @PutMapping
-    public Mono<Credit> update(Credit credit) {
+    public Mono<Credit> update(@RequestBody Credit credit) {
         return service.update(credit);
     }
 
