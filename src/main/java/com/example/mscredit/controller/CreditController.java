@@ -5,6 +5,8 @@ import com.example.mscredit.service.ICreditService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,8 +31,10 @@ public class CreditController {
     }
 
     @PostMapping
-    public Mono<Credit> create(@RequestBody Credit credit) {
-        return service.create(credit);
+    public Mono<ResponseEntity<Credit>> create(@RequestBody Credit credit) {
+        return service.create(credit)
+                .flatMap(c -> Mono.just(ResponseEntity.status(HttpStatus.CREATED).body(c)))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PutMapping

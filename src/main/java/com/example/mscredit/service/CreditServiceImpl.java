@@ -2,6 +2,7 @@ package com.example.mscredit.service;
 
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.repo.CreditRepo;
+import com.example.mscredit.util.CreditBusinessRulesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -21,7 +22,8 @@ public class CreditServiceImpl implements ICreditService {
 
     @Override
     public Mono<Credit> create(Credit credit) {
-        return repo.save(credit);
+        return CreditBusinessRulesUtil.findCustomerById(credit.getCustomerId())
+                .flatMap(customer -> repo.save(credit));
     }
 
     @Override
