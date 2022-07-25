@@ -33,4 +33,9 @@ public class CreditServiceImpl implements ICreditService {
     public Mono<Void> delete(String creditId) {
         return repo.deleteById(creditId);
     }
+
+    @Override
+    public Mono<Credit> findById(String id) {
+        return repo.findById(id);
+    }
 }

@@ -9,4 +9,6 @@ public interface ICreditService {
     Mono<Credit> create(Credit credit);
     Mono<Credit> update(Credit credit);
     Mono<Void> delete(String creditId);
+
+    Mono<Credit> findById(String id);
 }

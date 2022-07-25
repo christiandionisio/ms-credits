@@ -44,4 +44,9 @@ public class CreditController {
     }
 
 
+    @GetMapping("/{id}")
+    public Mono<Credit> read(@PathVariable String id){
+        Mono<Credit> credit = service.findById(id);
+        return credit;
+    }
 }

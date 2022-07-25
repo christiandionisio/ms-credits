@@ -20,4 +20,5 @@ public class Credit {
     private String monthlyFee;
     private String creditType;
     private String customerId;
+    private Integer interestRate;
 }
