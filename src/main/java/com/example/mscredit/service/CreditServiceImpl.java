@@ -1,5 +1,7 @@
 package com.example.mscredit.service;
 
+import com.example.mscredit.enums.CustomerTypeEnum;
+import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.repo.CreditRepo;
 import com.example.mscredit.util.CreditBusinessRulesUtil;
@@ -23,7 +25,12 @@ public class CreditServiceImpl implements ICreditService {
     @Override
     public Mono<Credit> create(Credit credit) {
         return CreditBusinessRulesUtil.findCustomerById(credit.getCustomerId())
-                .flatMap(customer -> repo.save(credit));
+                .flatMap(customer -> (customer.getCustomerType().equalsIgnoreCase(CustomerTypeEnum.PERSONNEL.getValue()))
+                        ? repo.findByCustomerId(customer.getCustomerId())
+                            .flatMap(creditDB -> Mono.<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
+                            .switchIfEmpty(repo.save(credit))
+                        : repo.save(credit)
+                );
     }
 
     @Override
