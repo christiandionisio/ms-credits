@@ -1,5 +1,7 @@
 package com.example.mscredit.controller;
 
+import com.example.mscredit.dto.ResponseTemplateDTO;
+import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.service.ICreditService;
 import org.apache.logging.log4j.LogManager;
@@ -31,9 +33,18 @@ public class CreditController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Credit>> create(@RequestBody Credit credit) {
+    public Mono<ResponseEntity<Object>> create(@RequestBody Credit credit) {
         return service.create(credit)
-                .flatMap(c -> Mono.just(ResponseEntity.status(HttpStatus.CREATED).body(c)))
+                .flatMap(c -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)))
+                .onErrorResume(e -> {
+                    if (e instanceof PersonalCustomerAlreadyHaveCreditException) {
+                        logger.error(e.getMessage());
+                        return Mono.just(new ResponseEntity<>(new ResponseTemplateDTO(null,
+                                e.getMessage()), HttpStatus.FORBIDDEN));
+                    }
+                    logger.error(e.getMessage());
+                    return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+                })
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
