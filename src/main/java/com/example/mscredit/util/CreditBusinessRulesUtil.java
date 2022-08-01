@@ -11,7 +11,7 @@ public class CreditBusinessRulesUtil {
 
     public static Mono<CustomerDTO> findCustomerById(String id) {
         return WebClient.create().get()
-                .uri("http://localhost:8082/customers/" + id)
+                .uri("http://localhost:9082/customers/" + id)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(CustomerDTO.class);
