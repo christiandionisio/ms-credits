@@ -47,4 +47,9 @@ public class CreditServiceImpl implements ICreditService {
     public Mono<Credit> findById(String id) {
         return repo.findById(id);
     }
+
+    @Override
+    public Mono<Credit> findByCustomerId(String customerId) {
+        return repo.findByCustomerId(customerId);
+    }
 }

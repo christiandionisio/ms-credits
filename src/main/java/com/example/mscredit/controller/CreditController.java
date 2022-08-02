@@ -64,4 +64,11 @@ public class CreditController {
         Mono<Credit> credit = service.findById(id);
         return credit;
     }
+
+    @GetMapping("/findByCustomerId/{customerId}")
+    public Mono<ResponseEntity<Credit>> findByCustomerId(@PathVariable String customerId){
+        return service.findByCustomerId(customerId)
+                .flatMap(c -> Mono.just(new ResponseEntity<>(c, HttpStatus.OK)))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 }

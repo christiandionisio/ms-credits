@@ -11,4 +11,5 @@ public interface ICreditService {
     Mono<Void> delete(String creditId);
 
     Mono<Credit> findById(String id);
+    Mono<Credit> findByCustomerId(String customerId);
 }
