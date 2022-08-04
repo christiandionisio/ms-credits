@@ -1,24 +1,24 @@
 package com.example.mscredit.model;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 
 @Document(collection = "credits")
 @Data
 @AllArgsConstructor
 public class Credit {
-    @Id
-    private String creditId;
-    private BigDecimal creditBalance;
-    private String paymentDate;
-    private Integer timeLimit;
-    private String initialDate;
-    private BigDecimal monthlyFee;
-    private String creditType;
-    private String customerId;
-    private Integer interestRate;
+  @Id
+  private String creditId;
+  private BigDecimal creditBalance;
+  private String paymentDate;
+  private Integer timeLimit;
+  private String initialDate;
+  private BigDecimal monthlyFee;
+  private String creditType;
+  private String customerId;
+  private Integer interestRate;
 }

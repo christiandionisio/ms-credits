@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Mono;
 
 public interface CreditRepo extends ReactiveMongoRepository<Credit, String> {
-    Mono<Credit> findByCustomerId(String customerId);
+  Mono<Credit> findByCustomerId(String customerId);
 }

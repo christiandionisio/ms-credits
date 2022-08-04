@@ -11,45 +11,47 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CreditServiceImpl implements ICreditService {
+public class CreditServiceImpl implements CreditService {
 
-    @Autowired
-    private CreditRepo repo;
+  @Autowired
+  private CreditRepo repo;
 
 
-    @Override
-    public Flux<Credit> findAll() {
-        return repo.findAll();
-    }
+  @Override
+  public Flux<Credit> findAll() {
+    return repo.findAll();
+  }
 
-    @Override
-    public Mono<Credit> create(Credit credit) {
-        return CreditBusinessRulesUtil.findCustomerById(credit.getCustomerId())
-                .flatMap(customer -> (customer.getCustomerType().equalsIgnoreCase(CustomerTypeEnum.PERSONNEL.getValue()))
-                        ? repo.findByCustomerId(customer.getCustomerId())
-                            .flatMap(creditDB -> Mono.<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
-                            .switchIfEmpty(repo.save(credit))
-                        : repo.save(credit)
-                );
-    }
+  @Override
+  public Mono<Credit> create(Credit credit) {
+    return CreditBusinessRulesUtil.findCustomerById(credit.getCustomerId())
+            .flatMap(customer -> (customer.getCustomerType()
+                    .equalsIgnoreCase(CustomerTypeEnum.PERSONNEL.getValue()))
+                    ? repo.findByCustomerId(customer.getCustomerId())
+                    .flatMap(creditDB -> Mono
+                            .<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
+                    .switchIfEmpty(repo.save(credit))
+                    : repo.save(credit)
+            );
+  }
 
-    @Override
-    public Mono<Credit> update(Credit credit) {
-        return repo.save(credit);
-    }
+  @Override
+  public Mono<Credit> update(Credit credit) {
+    return repo.save(credit);
+  }
 
-    @Override
-    public Mono<Void> delete(String creditId) {
-        return repo.deleteById(creditId);
-    }
+  @Override
+  public Mono<Void> delete(String creditId) {
+    return repo.deleteById(creditId);
+  }
 
-    @Override
-    public Mono<Credit> findById(String id) {
-        return repo.findById(id);
-    }
+  @Override
+  public Mono<Credit> findById(String id) {
+    return repo.findById(id);
+  }
 
-    @Override
-    public Mono<Credit> findByCustomerId(String customerId) {
-        return repo.findByCustomerId(customerId);
-    }
+  @Override
+  public Mono<Credit> findByCustomerId(String customerId) {
+    return repo.findByCustomerId(customerId);
+  }
 }
