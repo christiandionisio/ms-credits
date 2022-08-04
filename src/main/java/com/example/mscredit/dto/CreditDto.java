@@ -1,27 +1,16 @@
-package com.example.mscredit.model;
+package com.example.mscredit.dto;
 
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 
 /**
- * Credit document.
+ * Credit Dto.
  *
  * @author Alisson Arteaga / Christian Dionisio
  * @version 1.0
  */
-@Document(collection = "credits")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class Credit {
-  @Id
+public class CreditDto {
   private String creditId;
   private BigDecimal creditBalance;
   private String paymentDate;
