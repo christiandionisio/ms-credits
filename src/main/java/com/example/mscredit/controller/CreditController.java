@@ -1,11 +1,14 @@
 package com.example.mscredit.controller;
 
+import com.example.mscredit.dto.CreditDTO;
 import com.example.mscredit.dto.ResponseTemplateDto;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.service.CreditService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,8 @@ public class CreditController {
 
   private static final Logger logger = LogManager.getLogger(CreditController.class);
 
+  private ModelMapper modelMapper = new ModelMapper();
+
   @GetMapping
   public Flux<Credit> findAll() {
     logger.debug("Debugging log");
@@ -40,8 +45,9 @@ public class CreditController {
   }
 
   @PostMapping
-  public Mono<ResponseEntity<Object>> create(@RequestBody Credit credit) {
-    return service.create(credit)
+  public Mono<ResponseEntity<Object>> create(@RequestBody CreditDTO creditDTO) {
+    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+    return service.create(modelMapper.map(creditDTO, Credit.class))
             .flatMap(c -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)))
             .onErrorResume(e -> {
               if (e instanceof PersonalCustomerAlreadyHaveCreditException) {
@@ -56,8 +62,9 @@ public class CreditController {
   }
 
   @PutMapping
-  public Mono<Credit> update(@RequestBody Credit credit) {
-    return service.update(credit);
+  public Mono<Credit> update(@RequestBody CreditDTO creditDTO) {
+    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+    return service.update(modelMapper.map(creditDTO, Credit.class));
   }
 
   @DeleteMapping("/{creditId}")
@@ -68,8 +75,7 @@ public class CreditController {
 
   @GetMapping("/{id}")
   public Mono<Credit> read(@PathVariable String id) {
-    Mono<Credit> credit = service.findById(id);
-    return credit;
+    return service.findById(id);
   }
 
   @GetMapping("/findByCustomerId/{customerId}")
