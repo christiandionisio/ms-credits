@@ -1,5 +1,12 @@
 package com.example.mscredit.enums;
 
+
+/**
+ * Type of customers.
+ *
+ * @author Alisson Arteaga / Christian Dionisio
+ * @version 1.0
+ */
 public enum CustomerTypeEnum {
   BUSINESS("BUSINESS"),
   PERSONNEL("PERSONNEL");

@@ -4,6 +4,13 @@ import com.example.mscredit.model.Credit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+/**
+ * Service layer of Credit product.
+ *
+ * @author Alisson Arteaga / Christian Dionisio
+ * @version 1.0
+ */
 public interface CreditService {
   Flux<Credit> findAll();
 

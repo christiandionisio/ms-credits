@@ -10,6 +10,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Service layer implementations of Credit product.
+ *
+ * @author Alisson Arteaga / Christian Dionisio
+ * @version 1.0
+ */
+
 @Service
 public class CreditServiceImpl implements CreditService {
 

@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Controller layer of Credits.
+ *
+ * @author Alisson Arteaga / Christian Dionisio
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/credits")
 public class CreditController {
@@ -29,6 +35,12 @@ public class CreditController {
 
   private static final Logger logger = LogManager.getLogger(CreditController.class);
 
+  /**
+   * Get list of Credits.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @GetMapping
   public Flux<Credit> findAll() {
     logger.debug("Debugging log");
@@ -39,6 +51,12 @@ public class CreditController {
     return service.findAll();
   }
 
+  /**
+   * Save a credit product.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @PostMapping
   public Mono<ResponseEntity<Object>> create(@RequestBody Credit credit) {
     return service.create(credit)
@@ -72,6 +90,12 @@ public class CreditController {
     return credit;
   }
 
+  /**
+   * Find Customer by Customer Id.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @GetMapping("/findByCustomerId/{customerId}")
   public Mono<ResponseEntity<Credit>> findByCustomerId(@PathVariable String customerId) {
     return service.findByCustomerId(customerId)

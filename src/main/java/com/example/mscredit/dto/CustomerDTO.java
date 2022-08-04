@@ -1,11 +1,16 @@
 package com.example.mscredit.dto;
 
+import java.util.Date;
 import lombok.Data;
 
-import java.util.Date;
-
+/**
+ * Customer Dto.
+ *
+ * @author Alisson Arteaga / Christian Dionisio
+ * @version 1.0
+ */
 @Data
-public class CustomerDTO {
+public class CustomerDto {
   private String customerId;
   private String name;
   private String lastName;
