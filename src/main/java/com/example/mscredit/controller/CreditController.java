@@ -5,12 +5,14 @@ import com.example.mscredit.dto.ResponseTemplateDto;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.service.CreditService;
+import java.net.URI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +36,7 @@ import reactor.core.publisher.Mono;
 public class CreditController {
 
   @Autowired
-  private CreditService service;
+  private CreditService creditService;
 
   private static final Logger logger = LogManager.getLogger(CreditController.class);
 
@@ -47,13 +49,11 @@ public class CreditController {
    * @version 1.0
    */
   @GetMapping
-  public Flux<Credit> findAll() {
-    logger.debug("Debugging log");
-    logger.info("Info log");
-    logger.warn("Hey, This is a warning!");
-    logger.error("Oops! We have an Error. OK");
-    logger.fatal("Damn! Fatal error. Please fix me.");
-    return service.findAll();
+  public Mono<ResponseEntity<Flux<Credit>>> findAll() {
+    return Mono.just(
+            ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(creditService.findAll()));
   }
 
   /**
@@ -65,7 +65,7 @@ public class CreditController {
   @PostMapping
   public Mono<ResponseEntity<Object>> create(@RequestBody CreditDto creditDto) {
     modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    return service.create(modelMapper.map(creditDto, Credit.class))
+    return creditService.create(modelMapper.map(creditDto, Credit.class))
             .flatMap(c -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)))
             .onErrorResume(e -> {
               if (e instanceof PersonalCustomerAlreadyHaveCreditException) {
@@ -79,21 +79,51 @@ public class CreditController {
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
   }
 
-  @PutMapping
-  public Mono<Credit> update(@RequestBody CreditDto creditDto) {
-    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    return service.update(modelMapper.map(creditDto, Credit.class));
-  }
-
-  @DeleteMapping("/{creditId}")
-  public Mono<Void> delete(@PathVariable String creditId) {
-    return service.delete(creditId);
-  }
-
-
+  /**
+   * Get detail of a credit by Id.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @GetMapping("/{id}")
-  public Mono<Credit> read(@PathVariable String id) {
-    return service.findById(id);
+  public Mono<ResponseEntity<Credit>> read(@PathVariable String id) {
+    return creditService.findById(id).map(credit -> ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(credit))
+            .defaultIfEmpty(ResponseEntity.notFound().build());
+  }
+
+  /**
+   * Update Credit By Id.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
+  @PutMapping("/{id}")
+  public Mono<ResponseEntity<Credit>> update(@RequestBody CreditDto creditDto,
+                                               @PathVariable String id) {
+    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+    return creditService.findById(id)
+            .flatMap(c -> creditService.update(modelMapper.map(creditDto, Credit.class)))
+            .map(creditUpdated -> ResponseEntity
+                    .created(URI.create("/credits/".concat(creditUpdated.getCreditId())))
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(creditUpdated))
+            .defaultIfEmpty(ResponseEntity.notFound().build());
+  }
+
+  /**
+   * Delete Customer By Id.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
+  @DeleteMapping("/{creditId}")
+  public Mono<ResponseEntity<Void>> delete(@PathVariable String creditId) {
+    return creditService.findById(creditId)
+            .flatMap(credit -> creditService.delete(credit.getCustomerId())
+                    .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT))))
+            .defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
   }
 
   /**
@@ -104,7 +134,7 @@ public class CreditController {
    */
   @GetMapping("/findByCustomerId/{customerId}")
   public Mono<ResponseEntity<Credit>> findByCustomerId(@PathVariable String customerId) {
-    return service.findByCustomerId(customerId)
+    return creditService.findByCustomerId(customerId)
             .flatMap(c -> Mono.just(new ResponseEntity<>(c, HttpStatus.OK)))
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
   }
