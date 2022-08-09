@@ -121,7 +121,7 @@ public class CreditController {
   @DeleteMapping("/{creditId}")
   public Mono<ResponseEntity<Void>> delete(@PathVariable String creditId) {
     return creditService.findById(creditId)
-            .flatMap(credit -> creditService.delete(credit.getCustomerId())
+            .flatMap(credit -> creditService.delete(credit.getCreditId())
                     .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT))))
             .defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
   }
