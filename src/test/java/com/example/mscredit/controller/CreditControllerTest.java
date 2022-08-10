@@ -18,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -148,5 +149,23 @@ public class CreditControllerTest {
             .accept(MediaType.APPLICATION_JSON_UTF8)
             .exchange()
             .expectStatus().isOk();
+  }
+
+  @Test
+  @DisplayName("Get Credit with overdue debt")
+  void creditWithOverdueDebtTest() {
+
+    List<Credit> creditList = new ArrayList<>();
+    creditList.add(CreditProvider.getCredit());
+
+    Mockito.when(creditService.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(), Mockito.anyString()))
+            .thenReturn(Flux.fromIterable(creditList));
+
+    webClient.get().uri("/credits/creditWithOverdueDebt?customerId=62db0bfcf109277146645933&date=20/08/2022")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(Credit.class)
+            .hasSize(1);
+
   }
 }

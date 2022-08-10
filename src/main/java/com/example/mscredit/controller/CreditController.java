@@ -133,8 +133,15 @@ public class CreditController {
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
   }
 
+  /**
+   * Get all the credits with overdue debt by customer ID.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @GetMapping("/creditWithOverdueDebt")
-  public Mono<ResponseEntity<Flux<Credit>>> test(@RequestParam String customerId, @RequestParam String date) {
+  public Mono<ResponseEntity<Flux<Credit>>> creditWithOverdueDebt(@RequestParam String customerId,
+                                                                  @RequestParam String date) {
     return Mono.just(
             ResponseEntity.ok()
                     .body(creditService.findCreditByCustomerIdAndPaymentDateBefore(customerId, date)));
