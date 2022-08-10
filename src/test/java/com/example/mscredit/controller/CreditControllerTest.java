@@ -1,6 +1,7 @@
 package com.example.mscredit.controller;
 
 import com.example.mscredit.dto.CreditDto;
+import com.example.mscredit.error.CustomerHasOverdueDebtException;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.provider.CreditProvider;
@@ -73,6 +74,18 @@ public class CreditControllerTest {
   void createWithPersonalCustomerAlreadyHaveCreditException() {
     Mockito.when(creditService.create(Mockito.any(Credit.class)))
             .thenReturn(Mono.error(new PersonalCustomerAlreadyHaveCreditException()));
+
+    webClient.post().uri("/credits")
+            .body(Mono.just(CreditProvider.getCreditDto()), CreditDto.class)
+            .exchange()
+            .expectStatus().isForbidden();
+  }
+
+  @Test
+  @DisplayName("Create credit with CustomerHasOverdueDebtException")
+  void createWithCustomerHasOverdueDebtException() {
+    Mockito.when(creditService.create(Mockito.any(Credit.class)))
+            .thenReturn(Mono.error(new CustomerHasOverdueDebtException()));
 
     webClient.post().uri("/credits")
             .body(Mono.just(CreditProvider.getCreditDto()), CreditDto.class)
