@@ -74,6 +74,7 @@ public class CreditController {
                         e.getMessage()), HttpStatus.FORBIDDEN));
               }
               logger.error(e.getMessage());
+              logger.error(e.toString());
               return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
             })
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());

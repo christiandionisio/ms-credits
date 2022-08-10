@@ -4,6 +4,8 @@ import com.example.mscredit.model.Credit;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 
 /**
  * Repository layer of Credit product.
@@ -13,4 +15,5 @@ import reactor.core.publisher.Mono;
  */
 public interface CreditRepo extends ReactiveMongoRepository<Credit, String> {
   Mono<Credit> findByCustomerId(String customerId);
+  Mono<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, LocalDateTime paymentDate);
 }

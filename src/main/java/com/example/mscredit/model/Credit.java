@@ -1,6 +1,8 @@
 package com.example.mscredit.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +26,7 @@ public class Credit {
   @Id
   private String creditId;
   private BigDecimal creditBalance;
-  private String paymentDate;
+  private LocalDateTime paymentDate;
   private Integer timeLimit;
   private String initialDate;
   private BigDecimal monthlyFee;
