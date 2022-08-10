@@ -2,6 +2,7 @@ package com.example.mscredit.repo;
 
 import com.example.mscredit.model.Credit;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -15,5 +16,5 @@ import java.time.LocalDateTime;
  */
 public interface CreditRepo extends ReactiveMongoRepository<Credit, String> {
   Mono<Credit> findByCustomerId(String customerId);
-  Mono<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, LocalDateTime paymentDate);
+  Flux<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, LocalDateTime paymentDate);
 }

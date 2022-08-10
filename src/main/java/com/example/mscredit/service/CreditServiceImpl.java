@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Service layer implementations of Credit product.
  *
@@ -22,6 +26,8 @@ public class CreditServiceImpl implements CreditService {
 
   @Autowired
   private CreditRepo repo;
+
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 
   @Override
@@ -60,5 +66,11 @@ public class CreditServiceImpl implements CreditService {
   @Override
   public Mono<Credit> findByCustomerId(String customerId) {
     return repo.findByCustomerId(customerId);
+  }
+
+  @Override
+  public Flux<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, String paymentDate) {
+    LocalDate paymentDateLocalDate = LocalDate.parse(paymentDate, FORMATTER);
+    return repo.findCreditByCustomerIdAndPaymentDateBefore(customerId, paymentDateLocalDate.atStartOfDay());
   }
 }

@@ -4,6 +4,8 @@ import com.example.mscredit.model.Credit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 
 /**
  * Service layer of Credit product.
@@ -23,4 +25,6 @@ public interface CreditService {
   Mono<Credit> findById(String id);
 
   Mono<Credit> findByCustomerId(String customerId);
+
+  Flux<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, String paymentDate);
 }
