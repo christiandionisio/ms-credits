@@ -2,6 +2,7 @@ package com.example.mscredit.controller;
 
 import com.example.mscredit.dto.CreditDto;
 import com.example.mscredit.dto.ResponseTemplateDto;
+import com.example.mscredit.error.CustomerHasOverdueDebtException;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.service.CreditService;
@@ -61,13 +62,13 @@ public class CreditController {
     return creditService.create(modelMapper.map(creditDto, Credit.class))
             .flatMap(c -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)))
             .onErrorResume(e -> {
-              if (e instanceof PersonalCustomerAlreadyHaveCreditException) {
+              if (e instanceof PersonalCustomerAlreadyHaveCreditException
+                      || e instanceof CustomerHasOverdueDebtException) {
                 logger.error(e.getMessage());
                 return Mono.just(new ResponseEntity<>(new ResponseTemplateDto(null,
                         e.getMessage()), HttpStatus.FORBIDDEN));
               }
               logger.error(e.getMessage());
-              logger.error(e.toString());
               return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
             })
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());

@@ -1,6 +1,7 @@
 package com.example.mscredit.service;
 
 import com.example.mscredit.enums.CustomerTypeEnum;
+import com.example.mscredit.error.CustomerHasOverdueDebtException;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.repo.CreditRepo;
@@ -40,10 +41,12 @@ public class CreditServiceImpl implements CreditService {
             .flatMap(customer -> (customer.getCustomerType()
                     .equalsIgnoreCase(CustomerTypeEnum.PERSONNEL.getValue()))
                     ? repo.findByCustomerId(customer.getCustomerId())
-                    .flatMap(creditDB -> Mono
-                            .<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
-                    .switchIfEmpty(repo.save(credit))
-                    : repo.save(credit)
+                      .flatMap(creditDB -> Mono
+                              .<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
+                      .switchIfEmpty(customerHasCreditOverdue(credit.getCustomerId())
+                              .flatMap(hasDebt -> validateAndCreateCreditWithoutDebt(credit, hasDebt)))
+                    : customerHasCreditOverdue(credit.getCustomerId())
+                        .flatMap(hasDebt -> validateAndCreateCreditWithoutDebt(credit, hasDebt))
             );
   }
 
@@ -71,5 +74,17 @@ public class CreditServiceImpl implements CreditService {
   public Flux<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, String paymentDate) {
     LocalDate paymentDateLocalDate = LocalDate.parse(paymentDate, FORMATTER);
     return repo.findCreditByCustomerIdAndPaymentDateBefore(customerId, paymentDateLocalDate.atStartOfDay());
+  }
+
+  private Mono<Boolean> customerHasCreditOverdue(String customerId) {
+    return repo.findCreditByCustomerIdAndPaymentDateBefore(customerId,
+                    LocalDate.now().atStartOfDay())
+            .hasElements();
+  }
+
+  private Mono<Credit> validateAndCreateCreditWithoutDebt(Credit credit, Boolean hasDebt) {
+    return (Boolean.TRUE.equals(hasDebt))
+            ? Mono.error(new CustomerHasOverdueDebtException())
+            : repo.save(credit);
   }
 }
