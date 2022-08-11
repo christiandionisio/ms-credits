@@ -1,6 +1,7 @@
 package com.example.mscredit.service;
 
 import com.example.mscredit.enums.CustomerTypeEnum;
+import com.example.mscredit.error.CustomerHasOverdueCreditCardDebtException;
 import com.example.mscredit.error.CustomerHasOverdueDebtException;
 import com.example.mscredit.error.PersonalCustomerAlreadyHaveCreditException;
 import com.example.mscredit.model.Credit;
@@ -85,6 +86,14 @@ public class CreditServiceImpl implements CreditService {
   private Mono<Credit> validateAndCreateCreditWithoutDebt(Credit credit, Boolean hasDebt) {
     return (Boolean.TRUE.equals(hasDebt))
             ? Mono.error(new CustomerHasOverdueDebtException())
-            : repo.save(credit);
+            : validateCreditCardDebtAndCreateCredit(credit);
+  }
+
+  private Mono<Credit> validateCreditCardDebtAndCreateCredit(Credit credit) {
+    return CreditBusinessRulesUtil.getCreditCardsWithOverdueDebt(credit.getCustomerId())
+            .hasElements()
+            .flatMap(hasDebt -> (Boolean.TRUE.equals(hasDebt))
+                    ? Mono.error(new CustomerHasOverdueCreditCardDebtException())
+                    : repo.save(credit));
   }
 }

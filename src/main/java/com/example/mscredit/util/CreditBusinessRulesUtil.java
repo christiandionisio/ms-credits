@@ -1,8 +1,11 @@
 package com.example.mscredit.util;
 
+import com.example.mscredit.dto.CreditCardDto;
+import com.example.mscredit.dto.CreditDto;
 import com.example.mscredit.dto.CustomerDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -26,6 +29,15 @@ public class CreditBusinessRulesUtil {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(CustomerDto.class);
+  }
+
+  public static Flux<CreditCardDto> getCreditCardsWithOverdueDebt(String idCustomer) {
+    return WebClient.create().get()
+            .uri("http://localhost:9084/credit-cards/creditCardsWithOverdueDebt?" +
+                    "customerId=" + idCustomer + "&hasDebt=true")
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToFlux(CreditCardDto.class);
   }
 
 }
