@@ -1,6 +1,8 @@
 package com.example.mscredit.service;
 
+import com.example.mscredit.dto.CreditCardDto;
 import com.example.mscredit.dto.CustomerDto;
+import com.example.mscredit.error.CustomerHasOverdueCreditCardDebtException;
 import com.example.mscredit.error.CustomerHasOverdueDebtException;
 import com.example.mscredit.model.Credit;
 import com.example.mscredit.provider.CreditProvider;
@@ -45,52 +47,66 @@ class CreditServiceImplTest {
                 .verifyComplete();
     }
 
-//    @Test
-//    void createCreditForPersonalCustomerTest() {
-//        try (MockedStatic<CreditBusinessRulesUtil> mockedStatic = Mockito.mockStatic(CreditBusinessRulesUtil.class)) {
-//            mockedStatic.when(() -> CreditBusinessRulesUtil.findCustomerById(Mockito.anyString()))
-//                    .thenReturn(Mono.just(getCustomerPersonal()));
-//
-//            Mockito.when(repo.findFirstByCustomerId(Mockito.anyString()))
-//                    .thenReturn(Mono.empty());
-//
-//            Mockito.when(repo.save(Mockito.any(Credit.class)))
-//                    .thenReturn(Mono.just(CreditProvider.getCredit()));
-//
-//            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
-//                            Mockito.any(LocalDateTime.class)))
-//                    .thenReturn(Flux.empty());
-//
-//            StepVerifier.create(service.create(CreditProvider.getCredit()))
-//                    .expectNext(CreditProvider.getCredit())
-//                    .verifyComplete();
-//
-//        }
-//    }
+    @Test
+    void createCreditForPersonalCustomerTest() {
+        try (MockedStatic<CreditBusinessRulesUtil> mockedStatic = Mockito.mockStatic(CreditBusinessRulesUtil.class)) {
+            mockedStatic.when(() -> CreditBusinessRulesUtil.findCustomerById(Mockito.anyString()))
+                    .thenReturn(Mono.just(getCustomerPersonal()));
+
+            Mockito.when(repo.findFirstByCustomerId(Mockito.anyString()))
+                    .thenReturn(Mono.empty());
+
+            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
+                    Mockito.any(LocalDateTime.class)))
+                    .thenReturn(Flux.empty());
+
+            mockedStatic.when(() -> CreditBusinessRulesUtil.getCreditCardsWithOverdueDebt(Mockito.anyString()))
+                    .thenReturn(Flux.empty());
+
+            Mockito.when(repo.save(Mockito.any(Credit.class)))
+                    .thenReturn(Mono.just(CreditProvider.getCredit()));
+
+            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
+                            Mockito.any(LocalDateTime.class)))
+                    .thenReturn(Flux.empty());
+
+            StepVerifier.create(service.create(CreditProvider.getCredit()))
+                    .expectNext(CreditProvider.getCredit())
+                    .verifyComplete();
+
+        }
+    }
 
 
-//    @Test
-//    void createCreditForBusinessCustomerTest() {
-//        try (MockedStatic<CreditBusinessRulesUtil> mockedStatic = Mockito.mockStatic(CreditBusinessRulesUtil.class)) {
-//            mockedStatic.when(() -> CreditBusinessRulesUtil.findCustomerById(Mockito.anyString()))
-//                    .thenReturn(Mono.just(getCustomerBusiness()));
-//
-//            Mockito.when(repo.findFirstByCustomerId(Mockito.anyString()))
-//                    .thenReturn(Mono.empty());
-//
-//            Mockito.when(repo.save(Mockito.any(Credit.class)))
-//                    .thenReturn(Mono.just(CreditProvider.getCredit()));
-//
-//            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
-//                            Mockito.any(LocalDateTime.class)))
-//                    .thenReturn(Flux.empty());
-//
-//            StepVerifier.create(service.create(CreditProvider.getCredit()))
-//                    .expectNext(CreditProvider.getCredit())
-//                    .verifyComplete();
-//
-//        }
-//    }
+    @Test
+    void createCreditForBusinessCustomerTest() {
+        try (MockedStatic<CreditBusinessRulesUtil> mockedStatic = Mockito.mockStatic(CreditBusinessRulesUtil.class)) {
+            mockedStatic.when(() -> CreditBusinessRulesUtil.findCustomerById(Mockito.anyString()))
+                    .thenReturn(Mono.just(getCustomerBusiness()));
+
+            Mockito.when(repo.findFirstByCustomerId(Mockito.anyString()))
+                    .thenReturn(Mono.empty());
+
+            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
+                            Mockito.any(LocalDateTime.class)))
+                    .thenReturn(Flux.empty());
+
+            mockedStatic.when(() -> CreditBusinessRulesUtil.getCreditCardsWithOverdueDebt(Mockito.anyString()))
+                    .thenReturn(Flux.empty());
+
+            Mockito.when(repo.save(Mockito.any(Credit.class)))
+                    .thenReturn(Mono.just(CreditProvider.getCredit()));
+
+            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
+                            Mockito.any(LocalDateTime.class)))
+                    .thenReturn(Flux.empty());
+
+            StepVerifier.create(service.create(CreditProvider.getCredit()))
+                    .expectNext(CreditProvider.getCredit())
+                    .verifyComplete();
+
+        }
+    }
 
     @Test
     void createCreditWithCustomerHasOverdueDebtExceptionTest() {
@@ -112,6 +128,31 @@ class CreditServiceImplTest {
 
             StepVerifier.create(service.create(CreditProvider.getCredit()))
                     .expectError(CustomerHasOverdueDebtException.class)
+                    .verify();
+
+        }
+    }
+
+    @Test
+    void createCreditWithCustomerHasOverdueCreditCardDebtExceptionTest() {
+        try (MockedStatic<CreditBusinessRulesUtil> mockedStatic = Mockito.mockStatic(CreditBusinessRulesUtil.class)) {
+            mockedStatic.when(() -> CreditBusinessRulesUtil.findCustomerById(Mockito.anyString()))
+                    .thenReturn(Mono.just(getCustomerBusiness()));
+
+            Mockito.when(repo.findFirstByCustomerId(Mockito.anyString()))
+                    .thenReturn(Mono.empty());
+
+            Mockito.when(repo.findCreditByCustomerIdAndPaymentDateBefore(Mockito.anyString(),
+                            Mockito.any(LocalDateTime.class)))
+                    .thenReturn(Flux.empty());
+
+            List<CreditCardDto> creditCardDtoList = new ArrayList<>();
+            creditCardDtoList.add(new CreditCardDto());
+            mockedStatic.when(() -> CreditBusinessRulesUtil.getCreditCardsWithOverdueDebt(Mockito.anyString()))
+                    .thenReturn(Flux.fromIterable(creditCardDtoList));
+
+            StepVerifier.create(service.create(CreditProvider.getCredit()))
+                    .expectError(CustomerHasOverdueCreditCardDebtException.class)
                     .verify();
 
         }
