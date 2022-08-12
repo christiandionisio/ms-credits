@@ -15,6 +15,6 @@ import java.time.LocalDateTime;
  * @version 1.0
  */
 public interface CreditRepo extends ReactiveMongoRepository<Credit, String> {
-  Mono<Credit> findByCustomerId(String customerId);
+  Mono<Credit> findFirstByCustomerId(String customerId);
   Flux<Credit> findCreditByCustomerIdAndPaymentDateBefore(String customerId, LocalDateTime paymentDate);
 }

@@ -41,7 +41,7 @@ public class CreditServiceImpl implements CreditService {
     return CreditBusinessRulesUtil.findCustomerById(credit.getCustomerId())
             .flatMap(customer -> (customer.getCustomerType()
                     .equalsIgnoreCase(CustomerTypeEnum.PERSONNEL.getValue()))
-                    ? repo.findByCustomerId(customer.getCustomerId())
+                    ? repo.findFirstByCustomerId(customer.getCustomerId())
                       .flatMap(creditDB -> Mono
                               .<Credit>error(new PersonalCustomerAlreadyHaveCreditException()))
                       .switchIfEmpty(customerHasCreditOverdue(credit.getCustomerId())
@@ -68,7 +68,7 @@ public class CreditServiceImpl implements CreditService {
 
   @Override
   public Mono<Credit> findByCustomerId(String customerId) {
-    return repo.findByCustomerId(customerId);
+    return repo.findFirstByCustomerId(customerId);
   }
 
   @Override
